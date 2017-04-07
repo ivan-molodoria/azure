@@ -1,5 +1,5 @@
 #!/bin/bash
-		
+
 # Create a resource group.
 az group create --name myResourceGroup --location westcentralus
 
@@ -7,9 +7,10 @@ az group create --name myResourceGroup --location westcentralus
 az network vnet create --resource-group myResourceGroup --name myVnet --subnet-name mySubnet
 
 # Create a public IP address.
-az network public-ip create --resource-group myResourceGroup --name myPublicIP 
+az network public-ip create --resource-group myResourceGroup --name myPublicIP
 
-# Create a network security group.az network nsg create --resource-group myResourceGroup --name myNetworkSecurityGroup
+# Create a network security group.
+az network nsg create --resource-group myResourceGroup --name myNetworkSecurityGroup
 
 # Create a virtual network card and associate with public IP address and NSG.
 az network nic create \
@@ -21,10 +22,9 @@ az network nic create \
   --public-ip-address myPublicIP
 
 # Create a new virtual machine, this creates SSH keys if not present.
-az vm create --resource-group myResourceGroup --name VM1 --nics myNic --image UbuntuLTS --generate-ssh-keys  --public-ip-address-dns-name molodoria.westcentralus.cloudapp.azure.com
-
-# Open port 22 to allow SSh traffic to host.
-az vm open-port --port 22 --resource-group myResourceGroup --name VM1 --priority 102
+#az vm create -n VM1 -g myResourceGroup --image UbuntuLTS --vnet-name myVnet --name myNic --subnet mySubnet --public-ip-address-dns-name molodoria --ssh-key-value ""
+az vm create -n VM1 -g myResourceGroup --image UbuntuLTS  --vnet-name myVnet --subnet mySubnet  --public-ip-address-dns-name molodoria --ssh-key-value ""
+# Open port 80 to allow SSH traffic to host.
 az vm open-port --port 80 --resource-group myResourceGroup --name VM1 --priority 101
 
 # Use CustomScript extension to install NGINX.
