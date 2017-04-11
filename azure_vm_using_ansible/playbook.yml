@@ -1,0 +1,40 @@
+---
+  - name: Provisioning an Azure node
+    hosts: local
+    connection: local
+    gather_facts: False
+    tasks:
+
+    - name: Create a resource group
+      azure_rm_resourcegroup:
+       name: TestGroup
+       location: westus
+       tags:
+         testing: testing
+         delete: never
+
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+       resource_group: TestGroup
+       name: testvn001
+       address_prefixes: "10.10.0.0/16"
+
+    - name: Add subnet
+      azure_rm_subnet:
+       resource_group: TestGroup
+       name: subnet001
+       address_prefix: "10.10.0.0/24"
+       virtual_network: testvn001
+
+    - name: Creating VM
+      azure_rm_virtualmachine:
+       resource_group: TestGroup
+       name: testvm
+       vm_size: Standard_D1
+       admin_username: devops
+       admin_password: Queen17}
+       image:
+        offer: UbuntuServer
+        publisher: Canonical
+        sku: '14.04.4-LTS'
+        version: latest

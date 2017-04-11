@@ -1,0 +1,65 @@
+***Set up ansible to create Azure VM***
+
+1. Create new web app in dashboard
+APP SERVICES > ADD > choose WEB APP > CREATE > set up app name, nothing else. Press Create and wait 1-2 minutes for creation resource group
+
+2. Get information about your application to make sure that everything is OK
+
+# az ad app list --display-name YourAppName
+
+  You will get something like this:
+  {
+  "appId": "a487e0c1-82af-47d9-9a0b-af184eb87646d",
+  "appPermissions": null,
+  "availableToOtherTenants": false,
+  "displayName": "MyDemoWebApp",
+  "homepage": "http://MyDemoWebApp.azurewebsites.net",
+  "identifierUris": [
+    "http://MyDemoWebApp"
+  ],
+  "objectId": "bd07205b-629f-4a2e-945e-1ee5dadf610b9",
+  "objectType": "Application",
+  "replyUrls": []
+}
+
+3.Create the service principal
+
+# az ad sp create-for-rbac --name {appId} --password "{strong password}"
+
+{
+  "appId": "a487e0c1-82af-47d9-9a0b-af184eb87646d",
+  "displayName": "MyDemoWebApp",
+  "name": "http://MyDemoWebApp",
+  "password": {strong password},
+  "tenant": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+}
+
+# az login --service-principal -u a487e0c1-82af-47d9-9a0b-af184eb87646d --password {password} --tenant {tenant}
+[
+  {
+    "cloudName": "AzureCloud",
+    "id": "a487e0c1-82af-47d9-9a0b-af184eb87646d",
+    "isDefault": true,
+    "state": "Enabled",
+    "tenantId": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+    "user": {
+      "name": "https://MyDemoWebApp",
+      "type": "servicePrincipal"
+    }
+  }
+]
+
+4. Create file ~/.azure/credentials
+
+[default]
+client_id=a487e0c1-82af-47d9-9a0b-af184eb87646d   # app-id from previous step
+secret={strong password}                          #password from previous step
+tenant=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX       # from previous step
+subscription_id= xxxxxxxxxxxxxxxxxxxxxxxxx        # from previous step
+
+4. You must have python 2.7 and python-pip
+  at the first playbook launch you may need to install some additional ansible-python modules like azure>=2.0.0rc5
+
+   # pip install 'azure>=2.0.0rc5
+
+5. play the ansible playbook.
